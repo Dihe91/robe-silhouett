@@ -1,0 +1,680 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.1">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Geeza Pro'; -webkit-text-stroke: #000000}
+    span.s1 {font-kerning: none}
+    span.s2 {font: 12.0px 'Geeza Pro'; font-kerning: none}
+    span.s3 {font: 12.0px Helvetica; font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">import React, { useState, useEffect, useRef } from 'react';</span></p>
+<p class="p1"><span class="s1">import { ShoppingBag, Menu, X, Trash2, ArrowLeft, ArrowRight, Search, User, Check, Plus, Globe, Bell, Instagram, Send, ShieldCheck } from 'lucide-react';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 1. CONFIGURATION DES TRADUCTIONS ---</span></p>
+<p class="p1"><span class="s1">const TRANSLATIONS = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>fr: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>home: "Accueil",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cart: "Panier",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>search: "Rechercher",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>newSeason: "Nouvelle Collection",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>heroTitle: "Robe Stretch Minuit",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>discover: "Découvrir",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>size: "Taille",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>guide: "Guide des tailles",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>description: "Description",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: "Couleur",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>addToCart: "Ajouter au panier",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>buyNow: "Acheter maintenant",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>added: "Ajouté",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>summary: "Récapitulatif",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>subtotal: "Sous-total",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>delivery: "Livraison",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>free: "OFFERTE",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>total: "TOTAL",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checkout: "Finaliser la commande",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>continue: "Continuer mes achats",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>empty: "Votre panier est vide",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>remove: "Supprimer",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>liveBuy: "vient d'acheter",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>outOfStock: "Rupture de stock",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>onlyLeft: "Plus que {n} articles",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>lastOne: "Dernier article disponible",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>scroll: "DÉFILER",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutTitle: "La Vision Silhouett.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutSpeech: "Silhouett. est née d'une vision : celle d'une mode qui ne contraint pas, mais qui accompagne. Nous croyons en la pureté des lignes et en la liberté absolue de mouvement.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>philosophy: "Philosophie",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>manifesto: "Choisir l'essentiel.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalTitle: "Légal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection1: "Éditeur",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection2: "Hébergement",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection3: "Droits",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText1: "Silhouett. Studio Paris.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText2: "Hébergé par Vercel Inc.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText3: "Tous droits réservés.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>menuItems: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Collection", view: "home" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "À Propos", view: "about" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Légal", view: "legal" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>colors: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>black: "Noir",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>green: "Vert",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>orange: "Orange"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>en: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>home: "Home",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cart: "Cart",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>search: "Search",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>newSeason: "New Collection",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>heroTitle: "Midnight Stretch Dress",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>discover: "Discover",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>size: "Size",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>guide: "Size Guide",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>description: "Description",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: "Color",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>addToCart: "Add to cart",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>buyNow: "Buy now",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>added: "Added",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>summary: "Summary",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>subtotal: "Subtotal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>delivery: "Delivery",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>free: "FREE",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>total: "TOTAL",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checkout: "Checkout",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>continue: "Continue shopping",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>empty: "Your cart is empty",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>remove: "Remove",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>liveBuy: "just bought",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>outOfStock: "Out of stock",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>onlyLeft: "Only {n} left",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>lastOne: "Last one left",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>scroll: "SCROLL",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutTitle: "The Silhouett. Vision",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutSpeech: "Silhouett. was born from a vision: fashion that doesn't restrict, but accompanies. We believe in the purity of lines.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>philosophy: "Philosophy",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>manifesto: "Choosing the essential.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalTitle: "Legal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection1: "Publisher",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection2: "Hosting",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection3: "Rights",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText1: "Silhouett. Studio Paris.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText2: "Hosted by Vercel Inc.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText3: "All rights reserved.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>menuItems: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Collection", view: "home" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "About", view: "about" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Legal", view: "legal" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>colors: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>black: "Black",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>green: "Green",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>orange: "Orange"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>es: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>home: "Inicio",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cart: "Cesta",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>search: "Buscar",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>newSeason: "Nueva Colección",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>heroTitle: "Vestido Stretch Medianoche",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>discover: "Descubrir",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>size: "Talla",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>guide: "Guía de tallas",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>description: "Descripción",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: "Color",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>addToCart: "Añadir a la cesta",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>buyNow: "Comprar ahora",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>added: "Añadido",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>summary: "Resumen",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>subtotal: "Subtotal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>delivery: "Envío",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>free: "GRATIS",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>total: "TOTAL",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checkout: "Tramitar pedido",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>continue: "Seguir comprando",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>empty: "Tu cesta está vacía",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>remove: "Eliminar",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>liveBuy: "acaba de comprar",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>outOfStock: "Agotado",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>onlyLeft: "Solo quedan {n}",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>lastOne: "Último disponible",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>scroll: "BAJAR",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutTitle: "La Visión",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutSpeech: "Silhouett. nació de una visión: moda que no restringe, sino que acompaña.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>philosophy: "Filosofía",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>manifesto: "Elegir lo esencial.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalTitle: "Legal",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection1: "Editor",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection2: "Alojamiento",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection3: "Derechos",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText1: "Silhouett. Studio Paris.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText2: "Vercel Inc.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText3: "Todos los derechos reservados.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>menuItems: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Colección", view: "home" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Sobre nosotros", view: "about" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "Legal", view: "legal" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>colors: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>black: "Negro",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>green: "Verde",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>orange: "Naranja"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ar: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>home: "</span><span class="s2">الرئيسية</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cart: "</span><span class="s2">السلة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>search: "</span><span class="s2">بحث</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>newSeason: "</span><span class="s2">مجموعة</span><span class="s1"> </span><span class="s2">جديدة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>heroTitle: "</span><span class="s2">فستان</span><span class="s1"> </span><span class="s2">منتصف</span><span class="s1"> </span><span class="s2">الليل</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>discover: "</span><span class="s2">اكتشف</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>size: "</span><span class="s2">المقاس</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>guide: "</span><span class="s2">دليل</span><span class="s1"> </span><span class="s2">المقاسات</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>description: "</span><span class="s2">الوصف</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>color: "</span><span class="s2">اللون</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>addToCart: "</span><span class="s2">أضف</span><span class="s1"> </span><span class="s2">إلى</span><span class="s1"> </span><span class="s2">السلة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>buyNow: "</span><span class="s2">اشترِ</span><span class="s1"> </span><span class="s2">الآن</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>added: "</span><span class="s2">تمت</span><span class="s1"> </span><span class="s2">الإضافة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>summary: "</span><span class="s2">ملخص</span><span class="s1"> </span><span class="s2">الطلب</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>subtotal: "</span><span class="s2">المجموع</span><span class="s1"> </span><span class="s2">الفرعي</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>delivery: "</span><span class="s2">التوصيل</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>free: "</span><span class="s2">مجاني</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>total: "</span><span class="s2">الإجمالي</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checkout: "</span><span class="s2">إتمام</span><span class="s1"> </span><span class="s2">الطلب</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>continue: "</span><span class="s2">مواصلة</span><span class="s1"> </span><span class="s2">التسوق</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>empty: "</span><span class="s2">السلة</span><span class="s1"> </span><span class="s2">فارغة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>remove: "</span><span class="s2">حذف</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>liveBuy: "</span><span class="s2">اشترى</span><span class="s1"> </span><span class="s2">للتو</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>outOfStock: "</span><span class="s2">نفذت</span><span class="s1"> </span><span class="s2">الكمية</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>onlyLeft: "</span><span class="s2">بقي</span><span class="s1"> {n} </span><span class="s2">قطع</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>lastOne: "</span><span class="s2">آخر</span><span class="s1"> </span><span class="s2">قطعة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>scroll: "</span><span class="s2">انزل</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>aboutTitle: "</span><span class="s2">رؤيتنا</span><span class="s1">",</span></p>
+<p class="p3"><span class="s3"><span class="Apple-converted-space">    </span>aboutSpeech: "</span><span class="s1">ولدت</span><span class="s3"> </span><span class="s1">سيلويت</span><span class="s3"> </span><span class="s1">من</span><span class="s3"> </span><span class="s1">رؤية</span><span class="s3">: </span><span class="s1">أزياء</span><span class="s3"> </span><span class="s1">لا</span><span class="s3"> </span><span class="s1">تقيد،</span><span class="s3"> </span><span class="s1">بل</span><span class="s3"> </span><span class="s1">ترافق</span><span class="s3">.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>philosophy: "</span><span class="s2">الفلسفة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>manifesto: "</span><span class="s2">اختيار</span><span class="s1"> </span><span class="s2">الجوهر</span><span class="s1">.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalTitle: "</span><span class="s2">قانوني</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection1: "</span><span class="s2">الناشر</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection2: "</span><span class="s2">الاستضافة</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalSection3: "</span><span class="s2">الحقوق</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText1: "</span><span class="s2">دار</span><span class="s1"> </span><span class="s2">سيلويت</span><span class="s1"> </span><span class="s2">باريس</span><span class="s1">.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText2: "Vercel Inc.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legalText3: "</span><span class="s2">جميع</span><span class="s1"> </span><span class="s2">الحقوق</span><span class="s1"> </span><span class="s2">محفوظة</span><span class="s1">.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>menuItems: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "</span><span class="s2">المجموعة</span><span class="s1">", view: "home" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "</span><span class="s2">حول</span><span class="s1"> </span><span class="s2">العلامة</span><span class="s1">", view: "about" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: "</span><span class="s2">قانوني</span><span class="s1">", view: "legal" }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>colors: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>black: "</span><span class="s2">أسود</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>green: "</span><span class="s2">أخضر</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>orange: "</span><span class="s2">برتقالي</span><span class="s1">"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 2. DONNÉES VARIANTES ---</span></p>
+<p class="p1"><span class="s1">const VARIANTS = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>black: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>hex: "#1a1a1a",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>video: "https://videos.pexels.com/video-files/5555468/5555468-hd_1080_1920_30fps.mp4",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>mainImage: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>details: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1550614000-4b9519e09eb3?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?q=80&amp;w=1887&amp;auto=format&amp;fit=crop"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>stock: { "XS": 5, "S": 2, "M": 10, "L": 0, "XL": 1 }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>green: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>hex: "#2d4a3e",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>video: "https://videos.pexels.com/video-files/5555468/5555468-hd_1080_1920_30fps.mp4",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>mainImage: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>details: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1581044777550-4cfa60707c33?q=80&amp;w=1887&amp;auto=format&amp;fit=crop"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>stock: { "XS": 8, "S": 12, "M": 0, "L": 4, "XL": 5 }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>orange: {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>hex: "#d66a42",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>video: "https://videos.pexels.com/video-files/5555468/5555468-hd_1080_1920_30fps.mp4",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>mainImage: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>details: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&amp;w=1887&amp;auto=format&amp;fit=crop",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>"https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&amp;w=1887&amp;auto=format&amp;fit=crop"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>stock: { "XS": 0, "S": 0, "M": 15, "L": 20, "XL": 10 }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const PRODUCT_INFO = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>name: "La Robe Stretch Minuit",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>price: 29.99,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ref: "REF. 8849/220",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>description: "Robe courte en tissu extensible à effet seconde peau. Une coupe minimaliste conçue pour sublimer la ligne sans compromettre le mouvement."</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 3. COMPOSANTS UI ---</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const ScrollProgress = () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [width, setWidth] = useState(0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const handleScroll = () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>setWidth((window.scrollY / scrollTotal) * 100);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>window.addEventListener('scroll', handleScroll);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return () =&gt; window.removeEventListener('scroll', handleScroll);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, []);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return &lt;div className="fixed top-0 left-0 h-[2px] bg-black z-[200] transition-all duration-100" style={{ width: `${width}%` }} /&gt;;</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const LiveNotification = ({ t }) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [visible, setVisible] = useState(false);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [current, setCurrent] = useState(0);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Liste élargie de clients pour éviter les répétitions rapides</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const users = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>"Léa (Paris)", "Sarah (Lyon)", "Amira (Dubai)", "Elena (Madrid)",<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>"Chloé (Bordeaux)", "Inès (Marseille)", "Sophie (Bruxelles)",<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>"Camille (Genève)", "Lina (Casablanca)", "Emma (Londres)",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>"Clara (Nantes)", "Manon (Lille)", "Jade (Toulouse)", "Zoé (Nice)"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>];</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const usedIndices = useRef([]);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let timeoutId;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const showNextNotification = () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>let availableIndices = users</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.map((_, i) =&gt; i)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.filter(i =&gt; !usedIndices.current.includes(i));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Si tous les prénoms ont été utilisés, on réinitialise la pioche</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (availableIndices.length === 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>usedIndices.current = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>availableIndices = users.map((_, i) =&gt; i);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Tire un prénom au hasard parmi ceux restants</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>usedIndices.current.push(randomIndex);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">      </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>setCurrent(randomIndex);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>setVisible(true);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Cache la notification après 5 secondes</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>setTimeout(() =&gt; setVisible(false), 5000);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>// Programme la prochaine entre 1 minute (60 000ms) et 4 minutes (240 000ms)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const nextInterval = Math.floor(Math.random() * (240000 - 60000 + 1)) + 60000;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>timeoutId = setTimeout(showNextNotification, nextInterval);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Première notification après un court délai (entre 15s et 45s)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const initialDelay = Math.floor(Math.random() * (45000 - 15000 + 1)) + 15000;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>timeoutId = setTimeout(showNextNotification, initialDelay);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return () =&gt; clearTimeout(timeoutId);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, []);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!visible) return null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className="fixed bottom-6 left-6 z-[150] bg-white border border-gray-100 p-4 flex items-center gap-4 shadow-xl animate-fade-in-up"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className="w-8 h-8 bg-gray-900 flex items-center justify-center rounded-full"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;Bell size={14} className="text-white" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className="text-[10px] uppercase tracking-widest leading-none text-black"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p className="font-bold"&gt;{users[current]}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p className="text-gray-400 mt-1"&gt;{t.liveBuy} &lt;strong&gt;ROBE MINUIT&lt;/strong&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const Sidebar = ({ isOpen, onClose, t, setView, isRTL }) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!t || !t.menuItems) return null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className={`fixed inset-0 z-[160] transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`} onClick={onClose}&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className={`absolute top-0 h-full bg-white w-[85%] md:w-[400px] transition-transform duration-500 p-12 flex flex-col ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'} ${isRTL ? 'right-0' : 'left-0'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button onClick={onClose} className="self-end mb-16"&gt;&lt;X size={28} strokeWidth={1}/&gt;&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="space-y-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>{t.menuItems.map((item, i) =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>key={i}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>className={`block text-3xl font-serif uppercase tracking-tighter hover:pl-4 transition-all text-left ${isRTL ? 'text-right pr-4' : 'text-left'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>onClick={() =&gt; { setView(item.view); onClose(); window.scrollTo(0,0); }}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{item.label}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="mt-auto pt-8 border-t border-gray-100"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;p className="text-[10px] uppercase font-bold tracking-[0.3em] text-gray-300"&gt;Suivez-nous&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div className="flex gap-6 mt-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;Instagram size={20} className="cursor-pointer hover:opacity-50" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;Globe size={20} className="cursor-pointer hover:opacity-50" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const Header = ({ cartCount, setView, lang, setLang, t, onMenuOpen }) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [scrolled, setScrolled] = useState(false);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [langOpen, setLangOpen] = useState(false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const handleScroll = () =&gt; setScrolled(window.scrollY &gt; 50);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>window.addEventListener('scroll', handleScroll);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return () =&gt; window.removeEventListener('scroll', handleScroll);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, []);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;header className={`fixed top-0 w-full z-[140] transition-all duration-500 px-6 md:px-12 py-6 flex justify-between items-center ${scrolled ? 'bg-white/90 backdrop-blur-md border-b border-gray-100 py-4' : 'bg-transparent'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className="flex items-center space-x-8 rtl:space-x-reverse"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;Menu size={24} className={`cursor-pointer ${!scrolled ? 'text-white mix-blend-difference' : 'text-black'}`} onClick={onMenuOpen} /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="relative hidden md:block"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button onClick={() =&gt; setLangOpen(!langOpen)} className={`text-[10px] font-bold uppercase tracking-widest ${!scrolled ? 'text-white mix-blend-difference' : 'text-black'}`}&gt;{lang}&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>{langOpen &amp;&amp; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="absolute top-full mt-4 bg-white shadow-xl border border-gray-50 py-2 w-24 left-0 rtl:left-auto rtl:right-0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{['fr', 'en', 'es', 'ar'].map(l =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button key={l} onClick={() =&gt; { setLang(l); setLangOpen(false); }} className={`block w-full text-left rtl:text-right px-4 py-2 text-[10px] uppercase font-bold hover:bg-gray-50 ${lang === l ? 'text-black' : 'text-gray-400'}`}&gt;{l.toUpperCase()}&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h1 onClick={() =&gt; setView('home')} className={`absolute left-1/2 -translate-x-1/2 text-3xl md:text-5xl font-serif font-bold uppercase tracking-tighter cursor-pointer ${!scrolled ? 'text-white mix-blend-difference' : 'text-black'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>Silhouett.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/h1&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div onClick={() =&gt; setView('cart')} className={`flex items-center cursor-pointer relative ${!scrolled ? 'text-white mix-blend-difference' : 'text-black'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;ShoppingBag size={24} strokeWidth={1.5} /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;span className="text-[10px] font-bold ml-1"&gt;({cartCount})&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 4. PAGE D'ACCUEIL ---</span></p>
+<p class="p1"><span class="s1">const ShowcasePage = ({ addToCart, setView, t, currentStock, isRTL }) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [selectedVariant, setSelectedVariant] = useState('black');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [selectedSize, setSelectedSize] = useState(null);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [added, setAdded] = useState(false);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">  </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const variant = VARIANTS[selectedVariant];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const stockVal = selectedSize ? currentStock[selectedVariant][selectedSize] : null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const handleAction = (direct = false) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (!selectedSize) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>addToCart({ ...PRODUCT_INFO, ...variant, color: selectedVariant, colorName: t.colors[selectedVariant], size: selectedSize, cartId: Date.now() });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (direct) setView('cart');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>else { setAdded(true); setTimeout(() =&gt; setAdded(false), 2000); }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className="animate-fade-in bg-white" key={selectedVariant}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{/* HERO SECTION - Correction du clipping en haut */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;section className="h-[100vh] w-full relative bg-gray-100"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">         </span>&lt;video src={variant.video} poster={variant.mainImage} autoPlay loop muted playsInline className="w-full h-full object-cover" /&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">         </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">         </span>{/* Ajout d'un padding top important (pt-40) pour s'assurer que le texte ne soit jamais caché par le logo ou coupé */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">         </span>&lt;div className={`absolute inset-0 flex flex-col justify-center pt-40 p-8 md:p-24 text-white ${isRTL ? 'text-right' : 'text-left'}`}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span className="text-[11px] uppercase font-bold tracking-[0.5em] mb-6 animate-slide-up inline-block"&gt;{t.newSeason}&lt;/span&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{/* Utilisation de leading-[0.9] pour éviter de couper le haut des lettres géantes */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 className="text-6xl md:text-[9rem] font-serif uppercase leading-[0.9] tracking-tighter font-bold mb-16 animate-slide-up" style={{ animationDelay: '0.2s' }}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">               </span>{t.heroTitle.split(' ').map((word, i) =&gt; &lt;span key={i} className="block"&gt;{word}&lt;/span&gt;)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/h2&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button onClick={() =&gt; document.getElementById('details').scrollIntoView({behavior: 'smooth'})} className="w-fit border border-white px-10 py-4 text-[11px] uppercase font-bold tracking-widest hover:bg-white hover:text-black transition-all"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{t.discover}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">         </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/section&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{/* SECTION PRODUIT */}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;section id="details" className="py-20 flex flex-col md:flex-row min-h-screen"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="md:w-[60%] space-y-4 px-4 md:pl-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;img src={variant.mainImage} className="w-full h-auto" alt="Vue principale" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div className="grid grid-cols-2 gap-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{variant.details.map((img, i) =&gt; &lt;img key={i} src={img} className="w-full h-auto" alt="Détail" /&gt;)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="md:w-[40%] px-8 md:px-16 md:sticky md:top-24 h-fit text-black"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div className="max-w-sm mx-auto"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="mb-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;h2 className="text-3xl font-serif font-bold uppercase tracking-tighter mb-2"&gt;{PRODUCT_INFO.name}&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;p className="text-[10px] text-gray-400 tracking-widest"&gt;{PRODUCT_INFO.ref}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;p className="text-2xl mt-4"&gt;{PRODUCT_INFO.price.toFixed(2)} EUR&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="mb-12 border-t border-gray-100 pt-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;p className="text-[10px] font-bold uppercase mb-4 tracking-widest"&gt;{t.color}: {t.colors[selectedVariant]}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="flex gap-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>{Object.keys(VARIANTS).map(key =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>&lt;button key={key} onClick={() =&gt; { setSelectedVariant(key); setSelectedSize(null); }}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>className={`w-8 h-8 rounded-full border transition-all ${selectedVariant === key ? 'border-black scale-110' : 'border-transparent opacity-50'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>style={{ backgroundColor: VARIANTS[key].hex }}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>/&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="border-t border-gray-100 pt-8 mb-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between text-[10px] font-bold uppercase mb-6 tracking-widest"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;span&gt;{t.size}&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;span className="underline cursor-pointer"&gt;{t.guide}&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="grid grid-cols-5 gap-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{Object.keys(variant.stock).map(size =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>const s = variant.stock[size];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>const disabled = s === 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;button key={size} disabled={disabled} onClick={() =&gt; setSelectedSize(size)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>className={`py-4 text-[10px] font-bold border transition-all ${selectedSize === size ? 'bg-black text-white border-black' : disabled ? 'text-gray-200 border-gray-100 cursor-not-allowed' : 'border-gray-200 hover:border-black'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>{size}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>})}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="mt-4 min-h-[1rem]"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>{selectedSize &amp;&amp; stockVal &lt;= 3 &amp;&amp; stockVal &gt; 0 &amp;&amp; &lt;p className="text-[10px] text-orange-500 font-bold uppercase tracking-widest animate-pulse"&gt;{stockVal === 1 ? t.lastOne : t.onlyLeft.replace('{n}', stockVal)}&lt;/p&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>{selectedSize &amp;&amp; stockVal === 0 &amp;&amp; &lt;p className="text-[10px] text-red-500 font-bold uppercase tracking-widest"&gt;{t.outOfStock}&lt;/p&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="space-y-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;button disabled={!selectedSize || stockVal === 0} onClick={() =&gt; handleAction(false)}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>className={`w-full py-5 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${added ? 'bg-green-600 text-white border-green-600' : 'bg-white text-black border border-black hover:bg-black hover:text-white disabled:opacity-20'}`}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{added ? &lt;&gt;&lt;Check size={14}/&gt; {t.added}&lt;/&gt; : t.addToCart}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;button disabled={!selectedSize || stockVal === 0} onClick={() =&gt; handleAction(true)}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>className="w-full py-5 bg-black text-white text-[10px] font-bold uppercase tracking-widest hover:opacity-80 transition disabled:opacity-20"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>{t.buyNow}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="mt-16 pt-8 border-t border-gray-50"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;h3 className="text-[10px] font-bold uppercase mb-4 text-gray-400"&gt;{t.description}&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;p className="text-xs leading-relaxed text-gray-600 font-light uppercase tracking-tight"&gt;{PRODUCT_INFO.description}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/section&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 5. PAGE PANIER ---</span></p>
+<p class="p1"><span class="s1">const CartPage = ({ cart, removeFromCart, setView, t, onCheckout }) =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const total = cart.reduce((acc, item) =&gt; acc + item.price, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className="pt-32 pb-20 px-6 max-w-6xl mx-auto min-h-screen animate-fade-in text-black"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2 className="text-5xl font-serif font-bold uppercase tracking-tighter mb-12 border-b border-black pb-8"&gt;{t.cart}&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{cart.length === 0 ? (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="text-center py-20 flex flex-col items-center"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;p className="text-[11px] uppercase tracking-widest mb-8 text-gray-400"&gt;{t.empty}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button onClick={() =&gt; setView('home')} className="px-12 py-4 bg-black text-white text-[10px] font-bold uppercase hover:opacity-70 transition"&gt;{t.continue}&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>) : (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="flex flex-col lg:flex-row gap-16"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div className="flex-1 space-y-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{cart.map((item) =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div key={item.cartId} className="flex gap-8 border-b border-gray-100 pb-12 group"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;img src={item.mainImage} className="w-28 h-40 object-cover" alt="" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div className="flex-1 flex flex-col justify-between py-1"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;div className="flex justify-between items-start"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;h3 className="text-xl font-serif font-bold uppercase tracking-tighter"&gt;{item.name}&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                      </span>&lt;p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest"&gt;{t.size}: {item.size} • {item.colorName}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;span className="text-xl font-light"&gt;{item.price.toFixed(2)}€&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;button onClick={() =&gt; removeFromCart(item.cartId)} className="text-[10px] font-bold text-red-500 uppercase hover:underline w-fit"&gt;{t.remove}&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div className="lg:w-80 bg-gray-50 p-8 h-fit sticky top-32"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h4 className="text-[11px] font-bold uppercase mb-8 tracking-widest border-b border-black pb-4"&gt;{t.summary}&lt;/h4&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="space-y-4 mb-8 text-xs uppercase tracking-widest"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between"&gt;&lt;span&gt;{t.subtotal}&lt;/span&gt;&lt;span&gt;{total.toFixed(2)}€&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div className="flex justify-between text-gray-400"&gt;&lt;span&gt;{t.delivery}&lt;/span&gt;&lt;span className="text-green-600 font-bold"&gt;{t.free}&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div className="border-t border-gray-200 pt-6 mb-10 flex justify-between font-bold text-xl tracking-tighter"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;span&gt;{t.total}&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;span&gt;{total.toFixed(2)}€&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button onClick={onCheckout} className="w-full bg-black text-white py-5 text-[10px] font-bold uppercase hover:bg-gray-800 transition active:scale-95"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>{t.checkout}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 6. PAGE À PROPOS ---</span></p>
+<p class="p1"><span class="s1">const AboutPage = ({ t }) =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div className="pt-32 pb-20 px-6 max-w-5xl mx-auto animate-fade-in text-black"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className="flex flex-col md:flex-row gap-16 items-center"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className="md:w-1/2 aspect-[3/4] bg-gray-100 overflow-hidden"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" className="w-full h-full object-cover grayscale" alt="Heritage" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div className="md:w-1/2 space-y-12"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2 className="text-6xl font-serif font-bold uppercase tracking-tighter leading-none"&gt;{t.aboutTitle}&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p className="text-2xl font-light italic text-gray-600 font-serif"&gt;"{t.aboutSpeech}"&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="pt-8 border-t border-gray-100 flex items-center gap-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">           </span>&lt;div className="h-[1px] w-20 bg-black"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">           </span>&lt;p className="text-[10px] font-bold uppercase tracking-widest"&gt;{t.manifesto}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 7. PAGE LÉGAL ---</span></p>
+<p class="p1"><span class="s1">const LegalPage = ({ t }) =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div className="pt-32 pb-20 px-8 max-w-4xl mx-auto animate-fade-in text-black text-left rtl:text-right"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h2 className="text-6xl font-serif font-bold uppercase tracking-tighter mb-20"&gt;{t.legalTitle}&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className="grid grid-cols-1 md:grid-cols-2 gap-16"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{['1', '2', '3'].map(num =&gt; (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div key={num} className="space-y-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2"&gt;{t[`legalSection${num}`]}&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;p className="text-sm font-light leading-relaxed"&gt;{t[`legalText${num}`]}&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>))}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// --- 8. APPLICATION PRINCIPALE ---</span></p>
+<p class="p1"><span class="s1">export default function App() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [view, setView] = useState('home');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [cart, setCart] = useState([]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [stock, setStock] = useState(Object.keys(VARIANTS).reduce((acc, k) =&gt; ({...acc, [k]: {...VARIANTS[k].stock}}), {}));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [lang, setLang] = useState('fr');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const [isMenuOpen, setIsMenuOpen] = useState(false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (!document.querySelector('#tailwind-cdn')) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const s = document.createElement('script');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>s.id = 'tailwind-cdn'; s.src = "https://cdn.tailwindcss.com";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>document.head.appendChild(s);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, []);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const t = TRANSLATIONS[lang] || TRANSLATIONS['fr'];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const isRTL = lang === 'ar';</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const handleCheckout = () =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const newStock = { ...stock };</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cart.forEach(item =&gt; { if (newStock[item.color][item.size] &gt; 0) newStock[item.color][item.size] -= 1; });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>setStock(newStock);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>setCart([]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>alert(lang === 'ar' ? "</span><span class="s2">تم</span><span class="s1"> </span><span class="s2">تأكيد</span><span class="s1"> </span><span class="s2">طلبك</span><span class="s1">!" : "Commande confirmée !");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>setView('home');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div className={`font-sans antialiased text-black bg-white selection:bg-black selection:text-white ${isRTL ? 'font-arabic' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;style&gt;{`</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&amp;family=Playfair+Display:wght@700&amp;display=swap');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.font-serif { font-family: 'Playfair Display', serif; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.scrollbar-hide::-webkit-scrollbar { display: none; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.animate-fade-in { animation: fade-in 1s ease-out; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>@keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.animate-slide-up { animation: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>`}&lt;/style&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;ScrollProgress /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;Header cartCount={cart.length} setView={setView} lang={lang} setLang={setLang} t={t} onMenuOpen={() =&gt; setIsMenuOpen(true)} /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;Sidebar isOpen={isMenuOpen} onClose={() =&gt; setIsMenuOpen(false)} t={t} setView={setView} isRTL={isRTL} /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;LiveNotification t={t} /&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;main&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>{view === 'home' &amp;&amp; &lt;ShowcasePage addToCart={(p) =&gt; setCart([...cart, p])} setView={setView} t={t} currentStock={stock} isRTL={isRTL} /&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>{view === 'cart' &amp;&amp; &lt;CartPage cart={cart} removeFromCart={(id) =&gt; setCart(cart.filter(i =&gt; i.cartId !== id))} setView={setView} t={t} onCheckout={handleCheckout} /&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>{view === 'about' &amp;&amp; &lt;AboutPage t={t} /&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>{view === 'legal' &amp;&amp; &lt;LegalPage t={t} /&gt;}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/main&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;footer className="py-20 border-t border-gray-50 text-center bg-white"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2 className="text-4xl font-serif font-bold uppercase tracking-tighter mb-8"&gt;Silhouett.&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div className="flex justify-center space-x-10 text-[10px] font-bold uppercase text-gray-400 tracking-widest rtl:space-x-reverse"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">           </span>&lt;a href="#" className="hover:text-black transition-colors"&gt;Instagram&lt;/a&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">           </span>&lt;a href="#" className="hover:text-black transition-colors"&gt;Contact&lt;/a&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">           </span>&lt;button onClick={() =&gt; { setView('legal'); window.scrollTo(0,0); }} className="hover:text-black transition-colors uppercase"&gt;Légal&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p className="mt-12 text-[9px] text-gray-300 uppercase tracking-widest"&gt;Studio Paris • 2026&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/footer&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+</body>
+</html>
